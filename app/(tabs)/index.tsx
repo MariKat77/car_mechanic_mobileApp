@@ -7,6 +7,7 @@ import {
   Modal,
   TextInput,
   Button,
+  useColorScheme,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -14,8 +15,10 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
+import { Colors } from "@/constants/Colors";
 
 export default function HomeScreen() {
+  const colorScheme = useColorScheme();
   const [modalVisible, setModalVisible] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [formData, setFormData] = useState({
@@ -36,6 +39,15 @@ export default function HomeScreen() {
     // TODO: implement data saving logic
     console.log(formData);
     setModalVisible(false);
+    setFormData({
+      name: "",
+      phone: "",
+      date: "",
+      carModel: "",
+      year: "",
+      repairScope: "",
+      fuelType: "",
+    });
   };
 
   const onDateChange = (event: any, selectedDate: Date | undefined) => {
@@ -59,7 +71,11 @@ export default function HomeScreen() {
         style={styles.fab}
         onPress={() => setModalVisible(true)}
       >
-        <IconSymbol name="plus.circle" size={60} color="#fff"></IconSymbol>
+        <IconSymbol
+          name="plus.circle"
+          size={60}
+          color={Colors[colorScheme ?? "light"].tint}
+        ></IconSymbol>
       </TouchableOpacity>
       <Modal
         animationType="slide"
@@ -167,7 +183,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 30,
     right: 30,
-    backgroundColor: "grey",
   },
   modalView: {
     flex: 1,
