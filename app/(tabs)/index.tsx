@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Image,
   StyleSheet,
@@ -16,6 +16,17 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { Colors } from "@/constants/Colors";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+export type Client = {
+  name: string;
+  phone: string;
+  date: string;
+  carModel: string;
+  year: string;
+  repairScope: string;
+  fuelType: string;
+};
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
@@ -31,13 +42,46 @@ export default function HomeScreen() {
     fuelType: "",
   });
 
+  const [clients, setClients] = useState<Client[]>([]);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    loadClients();
+  }, []);
+
+  const loadClients = async () => {
+    try {
+      const storedClients = await AsyncStorage.getItem("clients");
+      if (storedClients) {
+        setClients(JSON.parse(storedClients));
+      }
+    } catch (error) {
+      console.error("Failed to load clients", error);
+    }
+  };
+
   const handleInputChange = (name: string, value: string) => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = () => {
-    // TODO: implement data saving logic
-    console.log(formData);
+  const handleSubmit = async () => {
+    try {
+      const updatedClients =
+        editingIndex !== null
+          ? clients.map((client, index) =>
+              index === editingIndex ? formData : client
+            )
+          : [...clients, formData];
+
+      await AsyncStorage.setItem("clients", JSON.stringify(updatedClients));
+      setClients(updatedClients);
+      resetForm();
+    } catch (error) {
+      console.error("Failed to save client", error);
+    }
+  };
+
+  const resetForm = () => {
     setModalVisible(false);
     setFormData({
       name: "",
@@ -48,6 +92,7 @@ export default function HomeScreen() {
       repairScope: "",
       fuelType: "",
     });
+    setEditingIndex(null);
   };
 
   const onDateChange = (event: any, selectedDate: Date | undefined) => {
@@ -55,6 +100,18 @@ export default function HomeScreen() {
     setShowDatePicker(false);
     const formattedDate = currentDate.toLocaleDateString();
     handleInputChange("date", formattedDate);
+  };
+
+  const handleEdit = (index: number) => {
+    setFormData(clients[index]);
+    setEditingIndex(index);
+    setModalVisible(true);
+  };
+
+  const handleDelete = async (index: number) => {
+    const updatedClients = clients.filter((_, i) => i !== index);
+    await AsyncStorage.setItem("clients", JSON.stringify(updatedClients));
+    setClients(updatedClients);
   };
 
   return (
@@ -66,6 +123,17 @@ export default function HomeScreen() {
         <ThemedText type="subtitle" style={{ marginLeft: 10 }}>
           Lista klientów:
         </ThemedText>
+        {clients.map((client, index) => (
+          <ThemedView key={index} style={styles.clientItem}>
+            <ThemedText>
+              {client.name} - {client.phone} - {client.date}
+            </ThemedText>
+            <ThemedView style={styles.buttonGroup}>
+              <Button title="Edytuj" onPress={() => handleEdit(index)} />
+              <Button title="Usuń" onPress={() => handleDelete(index)} />
+            </ThemedView>
+          </ThemedView>
+        ))}
       </ThemedView>
       <TouchableOpacity
         style={styles.fab}
@@ -81,11 +149,11 @@ export default function HomeScreen() {
         animationType="slide"
         transparent={true}
         visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
+        onRequestClose={resetForm}
       >
         <ThemedView style={styles.modalView}>
           <ThemedText type="title" style={{ marginBottom: 10 }}>
-            Dodaj klienta
+            {editingIndex !== null ? "Edytuj klienta" : "Dodaj klienta"}
           </ThemedText>
           <TextInput
             placeholder="Imię i nazwisko"
@@ -156,10 +224,13 @@ export default function HomeScreen() {
               value="energia elektryczna"
             />
           </Picker>
-          <View style={styles.buttonContainer}>
-            <Button title="Zapisz" onPress={handleSubmit} />
-            <Button title="Anuluj" onPress={() => setModalVisible(false)} />
-          </View>
+          <ThemedView style={styles.buttonContainer}>
+            <Button
+              title={editingIndex !== null ? "Zapisz" : "Dodaj"}
+              onPress={handleSubmit}
+            />
+            <Button title="Anuluj" onPress={resetForm} />
+          </ThemedView>
         </ThemedView>
       </Modal>
     </>
@@ -178,6 +249,10 @@ const styles = StyleSheet.create({
   stepContainer: {
     gap: 10,
     marginBottom: 8,
+  },
+  clientItem: {
+    marginLeft: 10,
+    marginBottom: 5,
   },
   fab: {
     position: "absolute",
@@ -213,5 +288,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     width: "100%",
     marginTop: 10,
+  },
+  buttonGroup: {
+    flexDirection: "row",
+    gap: 10,
   },
 });

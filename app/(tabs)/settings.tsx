@@ -2,28 +2,15 @@ import { ThemedView } from "@/components/ThemedView";
 import React, { useState } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
-import {
-  StyleSheet,
-  Modal,
-  TouchableOpacity,
-  TextInput,
-  Button,
-} from "react-native";
+import { StyleSheet, TouchableOpacity, TextInput, Button } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { ThemedText } from "@/components/ThemedText";
 
 export default function SettingsScreen() {
-  const [reminderDate, setReminderDate] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [reminderDay, setReminderDay] = useState("");
   const [reminderTime, setReminderTime] = useState(new Date());
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [serviceInterval, setServiceInterval] = useState("");
-
-  const onDateChange = (event: any, selectedDate: Date | undefined) => {
-    const currentDate = selectedDate || reminderDate;
-    setShowDatePicker(false);
-    setReminderDate(currentDate);
-  };
 
   const onTimeChange = (event: any, selectedTime: Date | undefined) => {
     const currentTime = selectedTime || reminderTime;
@@ -33,7 +20,7 @@ export default function SettingsScreen() {
 
   const handleSave = () => {
     // TODO: implement saving logic
-    console.log("Reminder Date:", reminderDate);
+    console.log("Reminder Date:", reminderDay);
     console.log("Reminder Time:", reminderTime);
     console.log("Service Interval:", serviceInterval);
   };
@@ -44,23 +31,18 @@ export default function SettingsScreen() {
         <ThemedText type="title">Ustawienia</ThemedText>
       </ThemedView>
       <ThemedView style={styles.container}>
-        <TouchableOpacity onPress={() => setShowDatePicker(true)}>
-          <TextInput
-            placeholder="Wybierz datę przypomnienia"
-            value={reminderDate.toLocaleDateString()}
-            style={styles.input}
-            editable={false}
-          />
-        </TouchableOpacity>
-        {showDatePicker && (
-          <DateTimePicker
-            value={reminderDate}
-            mode="date"
-            display="default"
-            onChange={onDateChange}
-          />
-        )}
-
+        <ThemedText type="subtitle">Wybór dnia przypomnienia</ThemedText>
+        <Picker
+          selectedValue={reminderDay}
+          onValueChange={(itemValue) => setReminderDay(itemValue)}
+          style={styles.picker}
+        >
+          <Picker.Item label="Wybierz dzień przypomnienia" value="" />
+          <Picker.Item label="1 dzień wcześniej" value="oneDay" />
+          <Picker.Item label="2 dni wcześniej" value="twoDays" />
+          <Picker.Item label="3 dni wcześniej" value="threeDays" />
+        </Picker>
+        <ThemedText type="subtitle">Wybór godziny przypomnienia</ThemedText>
         <TouchableOpacity onPress={() => setShowTimePicker(true)}>
           <TextInput
             placeholder="Wybierz godzinę przypomnienia"
@@ -80,7 +62,7 @@ export default function SettingsScreen() {
             onChange={onTimeChange}
           />
         )}
-
+        <ThemedText type="subtitle">Wybór okresu serwisowania</ThemedText>
         <Picker
           selectedValue={serviceInterval}
           onValueChange={(itemValue) => setServiceInterval(itemValue)}
