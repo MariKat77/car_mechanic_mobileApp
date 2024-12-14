@@ -8,6 +8,7 @@ import {
   TextInput,
   Button,
   useColorScheme,
+  FlatList,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -114,6 +115,24 @@ export default function HomeScreen() {
     setClients(updatedClients);
   };
 
+  const renderClientItem = ({
+    item,
+    index,
+  }: {
+    item: Client;
+    index: number;
+  }) => (
+    <ThemedView style={styles.clientItem}>
+      <ThemedText>
+        {item.name} - {item.phone} - {item.date}
+      </ThemedText>
+      <ThemedView style={styles.buttonGroup}>
+        <Button title="Edytuj" onPress={() => handleEdit(index)} />
+        <Button title="Usuń" onPress={() => handleDelete(index)} />
+      </ThemedView>
+    </ThemedView>
+  );
+
   return (
     <>
       <ThemedView style={styles.titleContainer}>
@@ -123,17 +142,12 @@ export default function HomeScreen() {
         <ThemedText type="subtitle" style={{ marginLeft: 10 }}>
           Lista klientów:
         </ThemedText>
-        {clients.map((client, index) => (
-          <ThemedView key={index} style={styles.clientItem}>
-            <ThemedText>
-              {client.name} - {client.phone} - {client.date}
-            </ThemedText>
-            <ThemedView style={styles.buttonGroup}>
-              <Button title="Edytuj" onPress={() => handleEdit(index)} />
-              <Button title="Usuń" onPress={() => handleDelete(index)} />
-            </ThemedView>
-          </ThemedView>
-        ))}
+        <FlatList
+          data={clients}
+          renderItem={renderClientItem}
+          keyExtractor={(item, index) => index.toString()}
+          contentContainerStyle={{ paddingBottom: 20 }}
+        />
       </ThemedView>
       <TouchableOpacity
         style={styles.fab}
@@ -247,6 +261,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   stepContainer: {
+    flex: 1,
     gap: 10,
     marginBottom: 8,
   },
@@ -288,6 +303,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     width: "100%",
     marginTop: 10,
+    backgroundColor: "rgba(0, 0, 0, 0)",
   },
   buttonGroup: {
     flexDirection: "row",
