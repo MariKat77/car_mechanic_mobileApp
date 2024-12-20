@@ -18,6 +18,9 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { Colors } from "@/constants/Colors";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Notifications from "expo-notifications";
+import * as Device from "expo-device";
+import { SchedulableTriggerInputTypes } from "expo-notifications";
 
 export type Client = {
   name: string;
@@ -47,6 +50,7 @@ export default function HomeScreen() {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
   useEffect(() => {
+    registerForPushNotificationsAsync();
     loadClients();
   }, []);
 
@@ -76,6 +80,7 @@ export default function HomeScreen() {
 
       await AsyncStorage.setItem("clients", JSON.stringify(updatedClients));
       setClients(updatedClients);
+      await scheduleNotifications(formData);
       resetForm();
     } catch (error) {
       console.error("Failed to save client", error);
@@ -132,6 +137,63 @@ export default function HomeScreen() {
       </ThemedView>
     </ThemedView>
   );
+
+  async function registerForPushNotificationsAsync() {
+    if (Device.isDevice) {
+      const { status: existingStatus } =
+        await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+
+      if (existingStatus !== "granted") {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+
+      if (finalStatus !== "granted") {
+        alert("Nie udało się uzyskać uprawnień do powiadomień!");
+        return;
+      }
+
+      const token = await Notifications.getExpoPushTokenAsync();
+      console.log("Token urządzenia:", token);
+    } else {
+      alert("Powiadomienia działają tylko na fizycznym urządzeniu!");
+    }
+  }
+
+  const scheduleNotifications = async (client: Client) => {
+    const settings = await AsyncStorage.getItem("settings");
+    if (settings) {
+      const { reminderDay, reminderTime, serviceInterval } =
+        JSON.parse(settings);
+
+      const serviceDate = new Date(client.date);
+      const notificationDate = new Date(serviceDate);
+      notificationDate.setDate(notificationDate.getDate() - reminderDay);
+      if (serviceInterval !== "0.5") {
+        notificationDate.setFullYear(
+          notificationDate.getFullYear() + serviceInterval
+        );
+      } else {
+        const monthsToAdd = serviceInterval * 12;
+        notificationDate.setMonth(notificationDate.getMonth() + monthsToAdd);
+      }
+      notificationDate.setHours(new Date(reminderTime).getHours());
+      notificationDate.setMinutes(new Date(reminderTime).getMinutes());
+
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Przypomnienie o serwisie",
+          body: `Czas na serwis dla ${client.name}!`,
+          sound: true,
+        },
+        trigger: {
+          type: SchedulableTriggerInputTypes.DATE,
+          date: notificationDate,
+        },
+      });
+    }
+  };
 
   return (
     <>

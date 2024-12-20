@@ -5,6 +5,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { StyleSheet, TouchableOpacity, TextInput, Button } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { ThemedText } from "@/components/ThemedText";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function SettingsScreen() {
   const [reminderDay, setReminderDay] = useState("");
@@ -18,8 +19,14 @@ export default function SettingsScreen() {
     setReminderTime(currentTime);
   };
 
-  const handleSave = () => {
-    // TODO: implement saving logic
+  const handleSave = async () => {
+    const settings = {
+      reminderDay,
+      reminderTime: reminderTime.toISOString(),
+      serviceInterval,
+    };
+    await AsyncStorage.setItem("settings", JSON.stringify(settings));
+
     console.log("Reminder Date:", reminderDay);
     console.log("Reminder Time:", reminderTime);
     console.log("Service Interval:", serviceInterval);
@@ -38,9 +45,9 @@ export default function SettingsScreen() {
           style={styles.picker}
         >
           <Picker.Item label="Wybierz dzień przypomnienia" value="" />
-          <Picker.Item label="1 dzień wcześniej" value="oneDay" />
-          <Picker.Item label="2 dni wcześniej" value="twoDays" />
-          <Picker.Item label="3 dni wcześniej" value="threeDays" />
+          <Picker.Item label="1 dzień wcześniej" value={1} />
+          <Picker.Item label="2 dni wcześniej" value={2} />
+          <Picker.Item label="3 dni wcześniej" value={3} />
         </Picker>
         <ThemedText type="subtitle">Wybór godziny przypomnienia</ThemedText>
         <TouchableOpacity onPress={() => setShowTimePicker(true)}>
@@ -69,9 +76,9 @@ export default function SettingsScreen() {
           style={styles.picker}
         >
           <Picker.Item label="Wybierz interwał serwisowy" value="" />
-          <Picker.Item label="Co 0.5 roku" value="halfYear" />
-          <Picker.Item label="Co rok" value="year" />
-          <Picker.Item label="Co 2 lata" value="twoYears" />
+          <Picker.Item label="Co 0.5 roku" value={0.5} />
+          <Picker.Item label="Co rok" value={1} />
+          <Picker.Item label="Co 2 lata" value={2} />
         </Picker>
 
         <Button title="Zapisz" onPress={handleSave} />
