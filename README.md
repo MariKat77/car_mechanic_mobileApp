@@ -1,50 +1,96 @@
-# Welcome to your Expo app 👋
+# Car Mechanic Mobile App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Car Mechanic Mobile App is a mobile application built using the Expo framework. The app is designed to help users keep track of their car mechanic visits, manage reminders, and receive push notifications for scheduled appointments.
 
-## Get started
+## Features
 
-1. Install dependencies
+- **Record Visits:** Add new visits with details like date, time and description.
+- **Reminders:** Set up reminders for upcoming appointments.
+- **Push Notifications:** Automatically receive notifications about upcoming visits.
+- **Visit History:** View a chronological list of past visits.
+
+## Requirements
+
+- Node.js version 14 or higher.
+- Expo CLI (installed globally): `npm install -g expo-cli`
+- A physical Android/iOS device or emulator.
+
+## Installation
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/MariKat77/car_mechanic_mobileApp.git
+   cd car_mechanic_mobileApp
+   ```
+
+2. Install dependencies:
 
    ```bash
    npm install
    ```
 
-2. Start the app
+3. Start the application:
 
    ```bash
-    npx expo start
+   expo start
    ```
 
-In the output, you'll find options to open the app in a
+4. Scan the QR code in the Expo Go app on your phone to run the application.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Technology Stack
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- **Expo:** Framework for rapid mobile application development using JavaScript/TypeScript.
+- **React Native:** Library for building user interfaces in mobile apps.
+- **Expo Notifications:** Module for handling push notifications.
+- **AsyncStorage:** Local database for storing user data.
 
-## Get a fresh project
+## Usage
 
-When you're ready, run:
+1. **Adding Visits:**
 
-```bash
-npm run reset-project
-```
+   - Tap the plus button on the main screen.
+   - Fill in visit details (name, phone, date, car model, repair scope, etc.).
+   - Save the visit.
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+2. **Setting Reminders:**
 
-## Learn more
+   - Go to the Settings screen.
+   - Choose reminder day, time, and service interval.
+   - Save the settings.
 
-To learn more about developing your project with Expo, look at the following resources:
+3. **Receiving Notifications:**
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+   - Ensure the app has notification permissions.
+   - Notifications will appear according to the configured reminder settings.
 
-## Join the community
+4. **Managing Visits:**
+   - Edit or delete existing visits from the list view.
 
-Join our community of developers creating universal apps.
+## Example Screens
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- **Home Screen:** List of visits with options to add, edit, or delete entries.
+- **Settings Screen:** Configure reminders and service intervals.
+
+## Development
+
+1. Create a branch for new features:
+
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+
+2. Implement your changes and submit a pull request to the main branch.
+
+## Contact
+
+For questions or suggestions about the project, contact: `mario.1999.mk@gmail.com`.
+
+---
+
+### Project Files
+
+- **`index.tsx`:** Main application logic for managing clients and appointments.
+- **`settings.tsx`:** Configuration for reminders and service intervals.
+
+Feel free to explore and contribute!
