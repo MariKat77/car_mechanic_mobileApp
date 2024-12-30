@@ -167,7 +167,14 @@ export default function HomeScreen() {
       const { reminderDay, reminderTime, serviceInterval } =
         JSON.parse(settings);
 
-      const serviceDate = new Date(client.date);
+      let splitedDate = client.date.split(".");
+      let formatedDate = new Date(
+        parseInt(splitedDate[2]),
+        parseInt(splitedDate[1]) - 1,
+        parseInt(splitedDate[0])
+      );
+      const serviceDate = new Date(formatedDate);
+      console.log(serviceDate.toISOString());
       const notificationDate = new Date(serviceDate);
       notificationDate.setDate(notificationDate.getDate() - reminderDay);
       if (serviceInterval !== "0.5") {
