@@ -28,4 +28,4 @@ jobs:
         run: npm install -g expo-cli
 
       - name: Build Expo project
-        run: expo build:web
+        run: npx expo export --platform web
